@@ -1,0 +1,123 @@
+import { Traveler } from '../types/traveler';
+import { addDays, format } from 'date-fns';
+
+// Mock data for demonstration
+export const mockTravelers: Traveler[] = [
+  {
+    id: '1',
+    passportNumber: 'US123456789',
+    fullName: 'John Smith',
+    dateOfBirth: '1985-03-15',
+    nationality: 'United States',
+    entryDate: '2026-04-01',
+    entryPort: 'Noi Bai Airport',
+    entryLocation: 'Hanoi',
+    entryReason: 'Tourism',
+    maxStayDays: 30,
+    maxStayDate: format(addDays(new Date('2026-04-01'), 30), 'yyyy-MM-dd'),
+    exitDate: undefined,
+    exitLocation: undefined,
+  },
+  {
+    id: '2',
+    passportNumber: 'UK987654321',
+    fullName: 'Emma Wilson',
+    dateOfBirth: '1990-07-22',
+    nationality: 'United Kingdom',
+    entryDate: '2026-04-10',
+    entryPort: 'Tan Son Nhat Airport',
+    entryLocation: 'Ho Chi Minh City',
+    entryReason: 'Business',
+    maxStayDays: 15,
+    maxStayDate: format(addDays(new Date('2026-04-10'), 15), 'yyyy-MM-dd'),
+    exitDate: '2026-04-23',
+    exitLocation: 'Tan Son Nhat Airport',
+  },
+  {
+    id: '3',
+    passportNumber: 'JP456789123',
+    fullName: 'Tanaka Yuki',
+    dateOfBirth: '1988-11-05',
+    nationality: 'Japan',
+    entryDate: '2026-03-20',
+    entryPort: 'Da Nang Airport',
+    entryLocation: 'Da Nang',
+    entryReason: 'Tourism',
+    maxStayDays: 30,
+    maxStayDate: format(addDays(new Date('2026-03-20'), 30), 'yyyy-MM-dd'),
+    exitDate: undefined,
+    exitLocation: undefined,
+  },
+  {
+    id: '4',
+    passportNumber: 'FR789456123',
+    fullName: 'Marie Dubois',
+    dateOfBirth: '1992-05-18',
+    nationality: 'France',
+    entryDate: '2026-03-01',
+    entryPort: 'Noi Bai Airport',
+    entryLocation: 'Hanoi',
+    entryReason: 'Work',
+    maxStayDays: 30,
+    maxStayDate: format(addDays(new Date('2026-03-01'), 30), 'yyyy-MM-dd'),
+    exitDate: undefined,
+    exitLocation: undefined,
+  },
+  {
+    id: '5',
+    passportNumber: 'AU321654987',
+    fullName: 'David Brown',
+    dateOfBirth: '1987-09-30',
+    nationality: 'Australia',
+    entryDate: '2026-04-15',
+    entryPort: 'Cam Ranh Airport',
+    entryLocation: 'Nha Trang',
+    entryReason: 'Tourism',
+    maxStayDays: 20,
+    maxStayDate: format(addDays(new Date('2026-04-15'), 20), 'yyyy-MM-dd'),
+    exitDate: undefined,
+    exitLocation: undefined,
+  },
+];
+
+// Common nationalities for dropdown
+export const nationalities = [
+  'United States',
+  'United Kingdom',
+  'Japan',
+  'France',
+  'Germany',
+  'Australia',
+  'Canada',
+  'South Korea',
+  'China',
+  'Singapore',
+  'Thailand',
+  'Malaysia',
+  'India',
+  'Other',
+];
+
+// Common entry ports in Vietnam
+export const entryPorts = [
+  'Noi Bai Airport',
+  'Tan Son Nhat Airport',
+  'Da Nang Airport',
+  'Cam Ranh Airport',
+  'Phu Quoc Airport',
+  'Lao Cai Border Gate',
+  'Mong Cai Border Gate',
+  'Huu Nghi Border Gate',
+  'Other',
+];
+
+// Entry reasons
+export const entryReasons = [
+  'Tourism',
+  'Business',
+  'Work',
+  'Education',
+  'Family Visit',
+  'Transit',
+  'Other',
+];
