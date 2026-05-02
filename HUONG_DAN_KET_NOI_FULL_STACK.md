@@ -1,52 +1,72 @@
-# Hướng dẫn kết nối Frontend React + Backend Java
+# Hướng dẫn kết nối Frontend React + Backend Java (PostgreSQL)
 
 ## 📋 Tổng quan
 
 Bạn hiện có:
 - ✅ **Frontend React** - Giao diện web hoàn chỉnh (đang dùng mock data)
 - ✅ **Backend Java Spring Boot** - API REST hoàn chỉnh (cần setup)
-- ✅ **Database MySQL** - Schema và sample data (cần cài đặt)
+- ✅ **Database PostgreSQL** - Schema và sample data (cần cài đặt)
 
 ## 🚀 Các bước thực hiện
 
-### ⭐ BƯỚC 1: Setup Backend Java + MySQL
+### ⭐ BƯỚC 1: Setup Backend Java + PostgreSQL
 
-#### 1.1. Cài đặt MySQL
+#### 1.1. Cài đặt PostgreSQL
+
+**Windows:**
 ```bash
-# Windows: Download từ https://dev.mysql.com/downloads/installer/
-# macOS:
-brew install mysql
-brew services start mysql
+# Download từ: https://www.postgresql.org/download/windows/
+# Chạy installer
+# Nhớ password cho user 'postgres'
+# Mặc định port: 5432
+```
 
-# Linux:
-sudo apt install mysql-server
-sudo systemctl start mysql
+**macOS:**
+```bash
+brew install postgresql@15
+brew services start postgresql@15
+```
+
+**Linux:**
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
 ```
 
 #### 1.2. Tạo database
+
+**Cách 1 - psql command:**
 ```bash
-mysql -u root -p
-# Nhập password, sau đó:
-CREATE DATABASE immigration_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-exit
+psql -U postgres
+
+# Trong psql:
+CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
+\q
 ```
 
-**HOẶC** chạy file SQL:
+**Cách 2 - Command trực tiếp:**
 ```bash
-mysql -u root -p < backend/database/schema.sql
+psql -U postgres -c "CREATE DATABASE immigration_db WITH ENCODING 'UTF8';"
 ```
 
-#### 1.3. Cấu hình backend
+#### 1.3. Tạo schema (bảng)
+
+```bash
+psql -U postgres -d immigration_db -f backend/database/schema.sql
+```
+
+#### 1.4. Cấu hình backend
 
 Mở file: `backend/src/main/resources/application.properties`
 
 Sửa dòng:
 ```properties
-spring.datasource.password=root
+spring.datasource.password=postgres
 ```
-Thành password MySQL của bạn!
+Thành password PostgreSQL của bạn!
 
-#### 1.4. Chạy backend
+#### 1.5. Chạy backend
 
 **Cách 1 - Command line:**
 ```bash
@@ -64,11 +84,11 @@ mvn spring-boot:run
 - Open `ImmigrationApplication.java`
 - Click "Run" hoặc F5
 
-#### 1.5. Kiểm tra backend
+#### 1.6. Kiểm tra backend
 
 Mở browser: http://localhost:8080/api/travelers
 
-✅ Nếu thấy JSON → Backend OK!
+✅ Nếu thấy JSON `{"success":true,"data":[],...}` → Backend OK!
 ❌ Nếu lỗi → Xem phần Troubleshooting
 
 ---
@@ -76,7 +96,7 @@ Mở browser: http://localhost:8080/api/travelers
 ### ⭐ BƯỚC 2: Import sample data (Optional)
 
 ```bash
-mysql -u root -p immigration_db < backend/database/sample_data.sql
+psql -U postgres -d immigration_db -f backend/database/sample_data.sql
 ```
 
 Refresh lại: http://localhost:8080/api/travelers
@@ -108,6 +128,7 @@ Mở file: `src/app/context/TravelerContext.tsx`
 Thêm import:
 ```typescript
 import * as api from '../services/api';
+import { useEffect } from 'react';
 ```
 
 Sửa state initialization:
@@ -145,7 +166,7 @@ const addTraveler = async (data: TravelerFormData) => {
       await api.createTraveler(data);
       await loadTravelers();
     } else {
-      // Mock mode
+      // Mock mode (fallback)
       const maxStayDate = format(
         addDays(new Date(data.entryDate), data.maxStayDays),
         'yyyy-MM-dd'
@@ -164,7 +185,49 @@ const addTraveler = async (data: TravelerFormData) => {
 };
 ```
 
-Tương tự cho updateTraveler và deleteTraveler.
+Cập nhật updateTraveler:
+```typescript
+const updateTraveler = async (id: string, data: TravelerFormData) => {
+  try {
+    if (api.API_READY) {
+      await api.updateTraveler(id, data);
+      await loadTravelers();
+    } else {
+      // Mock mode (fallback)
+      const maxStayDate = format(
+        addDays(new Date(data.entryDate), data.maxStayDays),
+        'yyyy-MM-dd'
+      );
+      setTravelers(
+        travelers.map((t) =>
+          t.id === id ? { ...t, ...data, maxStayDate } : t
+        )
+      );
+    }
+  } catch (error) {
+    console.error('Error updating traveler:', error);
+    alert('Lỗi: ' + (error as Error).message);
+  }
+};
+```
+
+Cập nhật deleteTraveler:
+```typescript
+const deleteTraveler = async (id: string) => {
+  try {
+    if (api.API_READY) {
+      await api.deleteTraveler(id);
+      await loadTravelers();
+    } else {
+      // Mock mode (fallback)
+      setTravelers(travelers.filter((t) => t.id !== id));
+    }
+  } catch (error) {
+    console.error('Error deleting traveler:', error);
+    alert('Lỗi: ' + (error as Error).message);
+  }
+};
+```
 
 ---
 
@@ -193,7 +256,11 @@ npm run dev
 4. Kiểm tra:
    - ✅ Du khách xuất hiện trong bảng
    - ✅ Refresh page → Dữ liệu vẫn còn (không mất)
-   - ✅ Check database: `SELECT * FROM travelers;`
+   - ✅ Check database:
+     ```bash
+     psql -U postgres -d immigration_db
+     SELECT * FROM travelers;
+     ```
 
 #### 4.3. Test API với Postman (Optional)
 
@@ -228,7 +295,13 @@ Content-Type: application/json
 {
   "passportNumber": "TEST123",
   "fullName": "Test User Updated",
-  ...
+  "dateOfBirth": "1990-01-01",
+  "nationality": "Vietnam",
+  "entryDate": "2026-05-01",
+  "entryPort": "Noi Bai Airport",
+  "entryLocation": "Hanoi",
+  "entryReason": "Tourism",
+  "maxStayDays": 30
 }
 ```
 
@@ -241,12 +314,14 @@ DELETE http://localhost:8080/api/travelers/1
 
 ## 🎯 Checklist hoàn thành
 
-- [ ] MySQL đã cài đặt và chạy
+- [ ] PostgreSQL đã cài đặt và chạy
 - [ ] Database `immigration_db` đã tạo
+- [ ] Schema (bảng travelers) đã tạo
 - [ ] Backend Java chạy thành công tại port 8080
 - [ ] API test OK: http://localhost:8080/api/travelers
 - [ ] Sample data đã import (optional)
 - [ ] File `api.ts` đã uncomment
+- [ ] `API_READY = true` trong api.ts
 - [ ] TravelerContext đã cập nhật để dùng API
 - [ ] Frontend chạy tại port 5173
 - [ ] Test thêm/sửa/xóa du khách thành công
@@ -258,15 +333,34 @@ DELETE http://localhost:8080/api/travelers/1
 
 ### Backend không chạy
 
-**Lỗi: "Access denied for user 'root'"**
-→ Sai password MySQL trong `application.properties`
+**Lỗi: "password authentication failed"**
+→ Sai password PostgreSQL trong `application.properties`
+→ Reset: `psql -U postgres` → `ALTER USER postgres PASSWORD 'new_password';`
 
-**Lỗi: "Communications link failure"**
-→ MySQL chưa chạy. Chạy: `mysql -u root -p`
+**Lỗi: "Connection refused"**
+→ PostgreSQL chưa chạy
+→ Start:
+```bash
+# macOS
+brew services start postgresql@15
+
+# Linux
+sudo systemctl start postgresql
+
+# Windows - Services → postgresql
+```
+
+**Lỗi: "database 'immigration_db' does not exist"**
+→ Chưa tạo database
+→ Chạy: `psql -U postgres -c "CREATE DATABASE immigration_db;"`
 
 **Lỗi: "Port 8080 already in use"**
 → Đổi port trong `application.properties`: `server.port=8081`
 → Nhớ đổi URL trong `api.ts` thành `http://localhost:8081/api`
+
+**Lỗi: "relation 'travelers' does not exist"**
+→ Chưa chạy schema.sql
+→ Chạy: `psql -U postgres -d immigration_db -f backend/database/schema.sql`
 
 ### Frontend không kết nối được Backend
 
@@ -282,6 +376,10 @@ DELETE http://localhost:8080/api/travelers/1
 → Kiểm tra console log xem có lỗi không
 → Kiểm tra `API_READY = true` trong api.ts
 → Kiểm tra useEffect đã gọi loadTravelers() chưa
+
+**Lỗi: "Cannot find module 'api'"**
+→ Import sai path
+→ Phải: `import * as api from '../services/api';`
 
 ---
 
@@ -314,11 +412,41 @@ immigration-management/
     │   ├── repository/
     │   └── service/
     ├── src/main/resources/
-    │   └── application.properties       ← Sửa MySQL password
+    │   └── application.properties       ← Sửa PostgreSQL password
     ├── database/
-    │   ├── schema.sql
-    │   └── sample_data.sql
+    │   ├── schema.sql                   ← Chạy file này
+    │   └── sample_data.sql              ← Optional
     └── pom.xml
+```
+
+---
+
+## 📝 PostgreSQL Cheat Sheet
+
+```bash
+# Kết nối database
+psql -U postgres -d immigration_db
+
+# List databases
+\l
+
+# Switch database
+\c immigration_db
+
+# List tables
+\dt
+
+# Describe table
+\d travelers
+
+# Query
+SELECT * FROM travelers;
+
+# Count
+SELECT COUNT(*) FROM travelers;
+
+# Exit
+\q
 ```
 
 ---
@@ -329,7 +457,7 @@ Sau khi hoàn thành, bạn sẽ có:
 
 ✅ **Backend API** chạy tại `http://localhost:8080`
 - 6 REST endpoints hoàn chỉnh
-- Kết nối MySQL
+- Kết nối PostgreSQL
 - Validation & Error handling
 - CORS enabled
 
@@ -339,8 +467,10 @@ Sau khi hoàn thành, bạn sẽ có:
 - Charts & statistics
 - Kết nối real-time với backend
 
-✅ **Database MySQL**
+✅ **Database PostgreSQL**
 - Bảng travelers với đầy đủ indexes
+- Auto-increment ID (BIGSERIAL)
+- Triggers cho updated_at
 - Sample data để demo
 
 ---

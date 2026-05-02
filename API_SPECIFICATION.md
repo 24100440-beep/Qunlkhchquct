@@ -260,13 +260,13 @@ Tài liệu này mô tả các API endpoints mà Java backend cần implement đ
 
 ---
 
-## Database Schema (Đề xuất)
+## Database Schema (PostgreSQL)
 
 ### Table: travelers
 
 ```sql
 CREATE TABLE travelers (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGSERIAL PRIMARY KEY,
     passport_number VARCHAR(50) NOT NULL UNIQUE,
     full_name VARCHAR(255) NOT NULL,
     date_of_birth DATE NOT NULL,
@@ -275,16 +275,32 @@ CREATE TABLE travelers (
     entry_port VARCHAR(255) NOT NULL,
     entry_location VARCHAR(255) NOT NULL,
     entry_reason VARCHAR(100) NOT NULL,
-    max_stay_days INT NOT NULL CHECK (max_stay_days >= 1),
+    max_stay_days INTEGER NOT NULL CHECK (max_stay_days >= 1),
     max_stay_date DATE NOT NULL,
     exit_date DATE NULL,
     exit_location VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_passport (passport_number),
-    INDEX idx_entry_date (entry_date),
-    INDEX idx_max_stay_date (max_stay_date)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create indexes
+CREATE INDEX idx_passport ON travelers(passport_number);
+CREATE INDEX idx_entry_date ON travelers(entry_date);
+CREATE INDEX idx_max_stay_date ON travelers(max_stay_date);
+
+-- Trigger for auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_travelers_updated_at
+    BEFORE UPDATE ON travelers
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 ```
 
 ---
@@ -314,10 +330,11 @@ CREATE TABLE travelers (
         <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
-    <!-- MySQL Driver -->
+    <!-- PostgreSQL Driver -->
     <dependency>
-        <groupId>com.mysql</groupId>
-        <artifactId>mysql-connector-j</artifactId>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>runtime</scope>
     </dependency>
 
     <!-- Validation -->
@@ -342,20 +359,26 @@ CREATE TABLE travelers (
 server.port=8080
 
 # Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/immigration_management
-spring.datasource.username=root
-spring.datasource.password=yourpassword
+spring.datasource.url=jdbc:postgresql://localhost:5432/immigration_db
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA Configuration
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
 
-# CORS Configuration
-spring.web.cors.allowed-origins=http://localhost:5173,http://localhost:3000
-spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS
-spring.web.cors.allowed-headers=*
+# PostgreSQL specific
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+# JSON Date Format
+spring.jackson.date-format=yyyy-MM-dd
+spring.jackson.time-zone=Asia/Ho_Chi_Minh
 ```
+
+**Lưu ý:** Thay `postgres` bằng password PostgreSQL của bạn!
 
 ---
 

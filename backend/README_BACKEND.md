@@ -1,10 +1,10 @@
-# Immigration Management System - Backend (Java Spring Boot)
+# Immigration Management System - Backend (Java Spring Boot + PostgreSQL)
 
 ## 🚀 Yêu cầu hệ thống
 
 - **Java**: JDK 17 hoặc cao hơn
 - **Maven**: 3.6+ (hoặc dùng Maven wrapper đã có sẵn)
-- **MySQL**: 8.0+ hoặc MariaDB 10.5+
+- **PostgreSQL**: 12+ hoặc cao hơn
 - **IDE**: IntelliJ IDEA, Eclipse, hoặc VS Code với Java Extension Pack
 
 ## 📁 Cấu trúc project
@@ -43,51 +43,66 @@ backend/
 
 ## 🔧 Hướng dẫn cài đặt
 
-### Bước 1: Cài đặt MySQL
+### Bước 1: Cài đặt PostgreSQL
 
 #### Windows:
-1. Download MySQL từ: https://dev.mysql.com/downloads/installer/
-2. Cài đặt và thiết lập password cho user `root`
+1. Download PostgreSQL từ: https://www.postgresql.org/download/windows/
+2. Chạy installer, thiết lập password cho user `postgres`
+3. Mặc định port: 5432
 
 #### macOS:
 ```bash
-brew install mysql
-brew services start mysql
+brew install postgresql@15
+brew services start postgresql@15
 ```
 
 #### Linux (Ubuntu):
 ```bash
 sudo apt update
-sudo apt install mysql-server
-sudo systemctl start mysql
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
 ```
 
 ### Bước 2: Tạo database
 
-Mở MySQL command line hoặc MySQL Workbench và chạy:
+#### Cách 1: Dùng psql command line
 
-```sql
-CREATE DATABASE immigration_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-**HOẶC** chạy file SQL:
 ```bash
-mysql -u root -p < backend/database/schema.sql
+# Kết nối vào PostgreSQL
+psql -U postgres
+
+# Tạo database
+CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
+
+# Thoát
+\q
 ```
 
-### Bước 3: Cấu hình database connection
+#### Cách 2: Chạy file SQL
+
+```bash
+psql -U postgres -c "CREATE DATABASE immigration_db WITH ENCODING 'UTF8';"
+```
+
+### Bước 3: Tạo bảng (Schema)
+
+```bash
+psql -U postgres -d immigration_db -f backend/database/schema.sql
+```
+
+### Bước 4: Cấu hình database connection
 
 Mở file `backend/src/main/resources/application.properties` và chỉnh sửa:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/immigration_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
+spring.datasource.url=jdbc:postgresql://localhost:5432/immigration_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_POSTGRES_PASSWORD_HERE
 ```
 
-**Thay `YOUR_MYSQL_PASSWORD_HERE` bằng password MySQL của bạn!**
+**Thay `YOUR_POSTGRES_PASSWORD_HERE` bằng password PostgreSQL của bạn!**
 
-### Bước 4: Chạy ứng dụng
+### Bước 5: Chạy ứng dụng
 
 #### Cách 1: Dùng Maven (command line)
 
@@ -127,7 +142,7 @@ cd backend
 3. Mở file `ImmigrationApplication.java`
 4. Click "Run" hoặc F5
 
-### Bước 5: Kiểm tra API
+### Bước 6: Kiểm tra API
 
 Sau khi chạy thành công, bạn sẽ thấy:
 
@@ -138,7 +153,7 @@ API URL: http://localhost:8080/api
 ==============================================
 ```
 
-**Test API bằng Postman hoặc Browser:**
+**Test API bằng Browser:**
 
 ```
 GET http://localhost:8080/api/travelers
@@ -151,7 +166,7 @@ Nếu thấy response JSON → Backend đã chạy thành công! ✅
 Để có dữ liệu demo ngay:
 
 ```bash
-mysql -u root -p immigration_db < backend/database/sample_data.sql
+psql -U postgres -d immigration_db -f backend/database/sample_data.sql
 ```
 
 Sau đó refresh API, bạn sẽ thấy 10 du khách mẫu.
@@ -297,25 +312,74 @@ const addTraveler = async (data: TravelerFormData) => {
 
 ## ❗ Troubleshooting
 
-### Lỗi: "Access denied for user 'root'@'localhost'"
-- Kiểm tra password MySQL trong `application.properties`
-- Reset password MySQL nếu cần
+### Lỗi: "password authentication failed for user 'postgres'"
+- Kiểm tra password PostgreSQL trong `application.properties`
+- Reset password nếu cần:
+  ```bash
+  sudo -u postgres psql
+  ALTER USER postgres PASSWORD 'new_password';
+  ```
 
-### Lỗi: "Communications link failure"
-- Kiểm tra MySQL đã chạy chưa: `mysql -u root -p`
-- Kiểm tra port 3306 có bị block không
+### Lỗi: "Connection refused"
+- Kiểm tra PostgreSQL đã chạy chưa:
+  ```bash
+  # Linux/macOS
+  sudo systemctl status postgresql
+  # hoặc
+  brew services list
+  
+  # Windows - Task Manager → Services → postgresql
+  ```
 
-### Lỗi: "Table 'travelers' doesn't exist"
-- Chạy lại file `schema.sql`
-- Hoặc thay `spring.jpa.hibernate.ddl-auto=update` thành `create` (1 lần)
+### Lỗi: "database 'immigration_db' does not exist"
+- Chạy lại: `psql -U postgres -c "CREATE DATABASE immigration_db;"`
 
 ### Lỗi: Port 8080 already in use
 - Đổi port trong `application.properties`: `server.port=8081`
 - Hoặc kill process đang dùng port 8080
 
+### Lỗi: "relation 'travelers' does not exist"
+- Chạy lại schema: `psql -U postgres -d immigration_db -f backend/database/schema.sql`
+
 ### CORS errors từ frontend
 - Kiểm tra `CorsConfig.java` đã có origins đúng chưa
 - Restart backend sau khi sửa config
+
+## 📝 PostgreSQL Commands hữu ích
+
+```bash
+# Kết nối vào database
+psql -U postgres -d immigration_db
+
+# List tất cả databases
+\l
+
+# Kết nối database khác
+\c immigration_db
+
+# List tất cả tables
+\dt
+
+# Xem cấu trúc bảng
+\d travelers
+
+# Query data
+SELECT * FROM travelers;
+
+# Thoát
+\q
+```
+
+## 🔄 So sánh MySQL vs PostgreSQL
+
+| Feature | MySQL | PostgreSQL |
+|---------|-------|------------|
+| Port | 3306 | 5432 |
+| Auto Increment | AUTO_INCREMENT | SERIAL / BIGSERIAL |
+| CLI | mysql | psql |
+| Default User | root | postgres |
+| Date Add | DATE_ADD() | + INTERVAL |
+| Update Timestamp | ON UPDATE | TRIGGER + FUNCTION |
 
 ## 📝 Notes
 
@@ -323,12 +387,13 @@ const addTraveler = async (data: TravelerFormData) => {
 - `maxStayDate` được tính tự động: entryDate + maxStayDays
 - Validation tự động check passport number unique
 - Tất cả dates dùng format: `yyyy-MM-dd`
+- PostgreSQL case-sensitive với table/column names
 
 ## 🎉 Hoàn tất!
 
 Bây giờ bạn có:
 ✅ Backend Java Spring Boot chạy tại: `http://localhost:8080`
 ✅ Frontend React chạy tại: `http://localhost:5173`
-✅ Database MySQL với sample data
+✅ Database PostgreSQL với sample data
 
 **Ready to demo cho thầy!** 🚀

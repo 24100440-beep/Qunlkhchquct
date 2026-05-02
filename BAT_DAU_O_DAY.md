@@ -8,12 +8,12 @@
 - Charts & biểu đồ
 - Đang chạy với mock data (dữ liệu giả)
 
-### ✅ BACKEND (Java Spring Boot) - CODE HOÀN THÀNH 100%
+### ✅ BACKEND (Java Spring Boot + PostgreSQL) - CODE HOÀN THÀNH 100%
 - Toàn bộ source code trong folder `backend/`
 - REST API đầy đủ (6 endpoints)
 - Database schema SQL
 - Sample data SQL
-- **Chỉ cần cài đặt và chạy!**
+- **Chỉ cần cài đặt PostgreSQL và chạy!**
 
 ---
 
@@ -33,65 +33,103 @@ Mở: http://localhost:5173
 
 ---
 
-### 🔵 Option 2: Setup Full Stack (Frontend + Backend) - 15-30 phút
+### 🔵 Option 2: Setup Full Stack (Frontend + Backend + PostgreSQL) - 20-30 phút
 
 **Đọc file này:** [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)
 
 **Tóm tắt các bước:**
 
-#### Bước 1: Cài MySQL
+#### Bước 1: Cài PostgreSQL
+
+**Windows:**
 ```bash
-# Download từ: https://dev.mysql.com/downloads/
-# Hoặc:
-brew install mysql  # macOS
-# Thiết lập password cho user root
+# Download: https://www.postgresql.org/download/windows/
+# Chạy installer, nhớ password cho user 'postgres'
+# Mặc định port: 5432
+```
+
+**macOS:**
+```bash
+brew install postgresql@15
+brew services start postgresql@15
+```
+
+**Linux:**
+```bash
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
 ```
 
 #### Bước 2: Tạo database
+
 ```bash
-mysql -u root -p
-CREATE DATABASE immigration_db;
-exit
+psql -U postgres
+CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
+\q
 ```
 
-#### Bước 3: Config backend
+Hoặc:
+```bash
+psql -U postgres -c "CREATE DATABASE immigration_db WITH ENCODING 'UTF8';"
+```
+
+#### Bước 3: Tạo schema (bảng)
+
+```bash
+psql -U postgres -d immigration_db -f backend/database/schema.sql
+```
+
+#### Bước 4: Config backend
+
 Mở: `backend/src/main/resources/application.properties`
 
 Sửa dòng:
 ```
-spring.datasource.password=root
+spring.datasource.password=postgres
 ```
-→ Thay `root` bằng password MySQL của bạn
+→ Thay `postgres` bằng password PostgreSQL của bạn
 
-#### Bước 4: Chạy backend
+#### Bước 5: Chạy backend
+
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
+Hoặc dùng IDE (IntelliJ/VS Code)
+
 Kiểm tra: http://localhost:8080/api/travelers
 → Nếu thấy JSON → OK!
 
-#### Bước 5: Import sample data (optional)
+#### Bước 6: Import sample data (optional)
+
 ```bash
-mysql -u root -p immigration_db < backend/database/sample_data.sql
+psql -U postgres -d immigration_db -f backend/database/sample_data.sql
 ```
 
-#### Bước 6: Kết nối frontend
+#### Bước 7: Kết nối frontend
+
 1. Mở: `src/app/services/api.ts`
 2. Uncomment tất cả code (bỏ `/*` và `*/`)
 3. Đổi `API_READY = false` thành `API_READY = true`
-4. Cập nhật `TravelerContext.tsx` theo hướng dẫn
+4. Cập nhật `TravelerContext.tsx` theo hướng dẫn trong file HUONG_DAN_KET_NOI_FULL_STACK.md
 
-#### Bước 7: Chạy frontend
+#### Bước 8: Chạy frontend
+
 ```bash
 npm run dev
 ```
 
-#### Bước 8: Test
+#### Bước 9: Test
+
 - Thêm du khách mới
 - Refresh page → Dữ liệu vẫn còn!
-- Check MySQL: `SELECT * FROM travelers;`
+- Check PostgreSQL:
+  ```bash
+  psql -U postgres -d immigration_db
+  SELECT * FROM travelers;
+  \q
+  ```
 
 ✅ HOÀN TẤT!
 
@@ -102,25 +140,51 @@ npm run dev
 | File | Nội dung |
 |------|----------|
 | **[HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)** | ⭐ Chi tiết từng bước setup Full Stack |
-| [backend/README_BACKEND.md](./backend/README_BACKEND.md) | Chi tiết về backend Java |
-| [API_SPECIFICATION.md](./API_SPECIFICATION.md) | API reference |
+| [backend/README_BACKEND.md](./backend/README_BACKEND.md) | Chi tiết về backend Java + PostgreSQL |
+| [API_SPECIFICATION.md](./API_SPECIFICATION.md) | API reference (đã update PostgreSQL) |
 | [README.md](./README.md) | Tổng quan project |
 
 ---
 
 ## 🆘 Gặp vấn đề?
 
+### PostgreSQL
+
+**Chưa cài PostgreSQL:**
+- Windows: https://www.postgresql.org/download/windows/
+- macOS: `brew install postgresql@15`
+- Linux: `sudo apt install postgresql`
+
+**Quên password:**
+```bash
+sudo -u postgres psql
+ALTER USER postgres PASSWORD 'new_password';
+```
+
+**PostgreSQL không chạy:**
+```bash
+# macOS
+brew services start postgresql@15
+
+# Linux
+sudo systemctl start postgresql
+```
+
 ### Backend không chạy
-- ❌ Sai password MySQL → Sửa trong `application.properties`
-- ❌ MySQL chưa chạy → Start MySQL service
+
+- ❌ Sai password PostgreSQL → Sửa trong `application.properties`
+- ❌ Database chưa tạo → Chạy `CREATE DATABASE immigration_db;`
+- ❌ Bảng chưa tạo → Chạy `schema.sql`
 - ❌ Port 8080 bị chiếm → Đổi port trong config
 
 ### Frontend không kết nối
+
 - ❌ Chưa uncomment code trong `api.ts`
 - ❌ `API_READY` vẫn = false
 - ❌ Backend chưa chạy
 
 ### CORS errors
+
 - ❌ Restart backend sau khi sửa CORS config
 
 Xem thêm trong: [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)
@@ -141,15 +205,15 @@ Xem thêm trong: [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STAC
 │   └── context/
 │       └── TravelerContext.tsx  # ← Cập nhật để dùng API
 │
-├── 📁 backend/              # Backend Java
+├── 📁 backend/              # Backend Java + PostgreSQL
 │   ├── src/main/java/
 │   │   └── com/immigration/
 │   ├── src/main/resources/
-│   │   └── application.properties  # ← Sửa password MySQL
+│   │   └── application.properties  # ← Sửa password
 │   ├── database/
-│   │   ├── schema.sql
-│   │   └── sample_data.sql
-│   └── pom.xml
+│   │   ├── schema.sql       # ← PostgreSQL schema
+│   │   └── sample_data.sql  # ← Sample data
+│   └── pom.xml              # ← PostgreSQL dependency
 │
 ├── 📄 BAT_DAU_O_DAY.md     # ← File này
 ├── 📄 HUONG_DAN_KET_NOI_FULL_STACK.md  # ← Đọc tiếp
@@ -162,14 +226,15 @@ Xem thêm trong: [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STAC
 
 ### Nếu bạn có 30 phút:
 1. ✅ Chạy frontend với mock data (1 phút)
-2. ✅ Setup MySQL + Backend (15 phút)
-3. ✅ Kết nối frontend-backend (10 phút)
-4. ✅ Test & demo (5 phút)
+2. ✅ Cài PostgreSQL (5 phút)
+3. ✅ Setup database + Backend (10 phút)
+4. ✅ Kết nối frontend-backend (10 phút)
+5. ✅ Test & demo (5 phút)
 
 ### Nếu bạn chỉ có 5 phút:
 1. ✅ Chạy frontend: `npm run dev`
 2. ✅ Demo với mock data
-3. ✅ Nói với thầy: "Backend đã code xong, chưa deploy"
+3. ✅ Nói với thầy: "Backend đã code xong, đang dùng PostgreSQL"
 
 ---
 
@@ -179,9 +244,20 @@ Sau khi hoàn thành, bạn có:
 
 ✅ Frontend đẹp mắt (4 trang)
 ✅ Backend Java hoàn chỉnh
-✅ Database MySQL
+✅ Database PostgreSQL
 ✅ Kết nối real-time
 ✅ Sẵn sàng demo!
+
+---
+
+## 💡 PostgreSQL vs MySQL
+
+Đã đổi sang PostgreSQL vì:
+- ✅ Open source hoàn toàn
+- ✅ Performance tốt hơn với large data
+- ✅ Hỗ trợ JSON, Array types
+- ✅ ACID compliance nghiêm ngặt
+- ✅ Phổ biến trong enterprise
 
 ---
 

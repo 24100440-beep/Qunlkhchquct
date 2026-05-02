@@ -28,7 +28,7 @@
 - Java 17
 - Spring Boot 3.2
 - Spring Data JPA
-- MySQL 8.0
+- PostgreSQL 12+
 - REST API
 - Maven
 
@@ -111,10 +111,13 @@ Frontend sẽ chạy với mock data tại: http://localhost:5173
 
 **1. Setup Backend:**
 ```bash
-# Cài MySQL và tạo database
-mysql -u root -p
-CREATE DATABASE immigration_db;
-exit
+# Cài PostgreSQL và tạo database
+psql -U postgres
+CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
+\q
+
+# Tạo schema
+psql -U postgres -d immigration_db -f backend/database/schema.sql
 
 # Chạy backend
 cd backend
@@ -160,11 +163,13 @@ Xem chi tiết trong [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_
 - [x] API service sẵn sàng
 - [ ] Uncomment API code khi backend chạy
 
-### Backend (Java):
+### Backend (Java + PostgreSQL):
 - [x] Full source code đã tạo
-- [x] Database schema SQL
+- [x] Database schema SQL (PostgreSQL)
 - [x] Sample data
-- [ ] Cài MySQL
+- [ ] Cài PostgreSQL
+- [ ] Tạo database
+- [ ] Chạy schema.sql
 - [ ] Config password trong application.properties
 - [ ] Chạy backend: `mvn spring-boot:run`
 - [ ] Test API: http://localhost:8080/api/travelers
@@ -174,7 +179,7 @@ Xem chi tiết trong [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_
 - [ ] Frontend uncomment API code
 - [ ] TravelerContext dùng API thay mock
 - [ ] Test thêm/sửa/xóa
-- [ ] Data lưu vào MySQL
+- [ ] Data lưu vào PostgreSQL
 
 ## 🎯 Trạng thái hiện tại
 
