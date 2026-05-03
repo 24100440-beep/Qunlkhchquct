@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Traveler, TravelerFormData } from '../types/traveler';
 import { mockTravelers } from '../data/mockData';
 import { addDays, format } from 'date-fns';
@@ -12,8 +12,32 @@ interface TravelerContextType {
 
 const TravelerContext = createContext<TravelerContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'immigration_travelers';
+
+// Load dữ liệu từ localStorage hoặc dùng mock data
+function loadTravelers(): Traveler[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+    console.error('Error loading travelers:', error);
+  }
+  return mockTravelers;
+}
+
 export function TravelerProvider({ children }: { children: ReactNode }) {
-  const [travelers, setTravelers] = useState<Traveler[]>(mockTravelers);
+  const [travelers, setTravelers] = useState<Traveler[]>(loadTravelers);
+
+  // Lưu vào localStorage mỗi khi travelers thay đổi
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(travelers));
+    } catch (error) {
+      console.error('Error saving travelers:', error);
+    }
+  }, [travelers]);
 
   const addTraveler = (data: TravelerFormData) => {
     const maxStayDate = format(
