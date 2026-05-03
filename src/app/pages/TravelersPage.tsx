@@ -12,9 +12,10 @@ export function TravelersPage() {
   const [editingTraveler, setEditingTraveler] = useState<Traveler | undefined>();
   const [searchName, setSearchName] = useState('');
   const [searchEntryDate, setSearchEntryDate] = useState('');
+ console .log(travelers);
 
   const filteredTravelers = useMemo(() => {
-    return travelers.filter((traveler) => {
+    return travelers?.data.filter((traveler) => {
       const nameMatch =
         searchName === '' ||
         traveler.fullName.toLowerCase().includes(searchName.toLowerCase()) ||
@@ -77,7 +78,7 @@ export function TravelersPage() {
       {/* Stats */}
       <div className="bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
         <p className="text-gray-600">
-          Hiển thị <span className="font-bold text-blue-600">{filteredTravelers.length}</span> / {travelers.length} du khách
+          Hiển thị <span className="font-bold text-blue-600">{filteredTravelers?.length}</span> / {travelers?.data.length || 0} du khách
         </p>
       </div>
 

@@ -20,7 +20,7 @@ import { TrendingUp, Globe, Calendar, Activity } from 'lucide-react';
 export function StatisticsPage() {
   const { travelers } = useTravelers();
   const today = new Date();
-
+const testdata=travelers?.data|| [];
   // Monthly entry data (last 6 months)
   const last6Months = eachMonthOfInterval({
     start: subMonths(today, 5),
@@ -31,12 +31,12 @@ export function StatisticsPage() {
     const start = startOfMonth(month);
     const end = endOfMonth(month);
 
-    const entries = travelers.filter((t) => {
+    const entries = travelers?.data.filter((t) => {
       const entryDate = new Date(t.entryDate);
       return entryDate >= start && entryDate <= end;
     }).length;
 
-    const exits = travelers.filter((t) => {
+    const exits = travelers?.data.filter((t) => {
       if (!t.exitDate) return false;
       const exitDate = new Date(t.exitDate);
       return exitDate >= start && exitDate <= end;
@@ -51,7 +51,7 @@ export function StatisticsPage() {
 
   // Nationality distribution
   const nationalityData = Object.entries(
-    travelers.reduce((acc, t) => {
+    testdata.reduce((acc, t) => {
       acc[t.nationality] = (acc[t.nationality] || 0) + 1;
       return acc;
     }, {} as Record<string, number>)
@@ -61,16 +61,16 @@ export function StatisticsPage() {
 
   // Entry reasons
   const reasonData = Object.entries(
-    travelers.reduce((acc, t) => {
+    testdata.reduce((acc, t) => {
       acc[t.entryReason] = (acc[t.entryReason] || 0) + 1;
       return acc;
     }, {} as Record<string, number>)
   ).map(([name, value]) => ({ name, value }));
 
   // Status distribution
-  const activeCount = travelers.filter((t) => !t.exitDate).length;
-  const exitedCount = travelers.filter((t) => t.exitDate).length;
-  const overstayCount = travelers.filter((t) => {
+  const activeCount = testdata.filter((t) => !t.exitDate).length;
+  const exitedCount = testdata.filter((t) => t.exitDate).length;
+  const overstayCount = testdata.filter((t) => {
     if (t.exitDate) return false;
     return differenceInDays(new Date(t.maxStayDate), today) < 0;
   }).length;
@@ -99,14 +99,14 @@ export function StatisticsPage() {
     {
       label: 'Thời gian lưu trú TB',
       value: Math.round(
-        travelers.reduce((sum, t) => sum + t.maxStayDays, 0) / travelers.length
+        testdata.reduce((sum, t) => sum + t.maxStayDays, 0) / testdata.length
       ) + ' ngày',
       icon: Calendar,
       color: 'from-purple-500 to-purple-600',
     },
     {
       label: 'Tổng giao dịch',
-      value: travelers.length,
+      value: testdata.length,
       icon: Activity,
       color: 'from-orange-500 to-orange-600',
     },

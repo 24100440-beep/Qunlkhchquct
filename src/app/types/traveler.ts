@@ -27,3 +27,7 @@ export interface TravelerFormData {
   exitDate?: string;
   exitLocation?: string;
 }
+export interface DataResponse {
+  total: number;
+  data: Traveler[];
+}

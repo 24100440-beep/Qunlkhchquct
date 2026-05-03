@@ -3,7 +3,7 @@ import { Edit, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import { differenceInDays } from 'date-fns';
 
 interface TravelerTableProps {
-  travelers: Traveler[];
+  travelers: Traveler[] | undefined;
   onEdit: (traveler: Traveler) => void;
   onDelete: (id: string) => void;
 }
@@ -49,7 +49,7 @@ export function TravelerTable({ travelers, onEdit, onDelete }: TravelerTableProp
     };
   };
 
-  if (travelers.length === 0) {
+  if (travelers?.length === 0) {
     return (
       <div className="text-center py-12 bg-gray-50 rounded-lg">
         <p className="text-gray-500">Không tìm thấy du khách nào</p>
@@ -92,7 +92,7 @@ export function TravelerTable({ travelers, onEdit, onDelete }: TravelerTableProp
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {travelers.map((traveler, index) => {
+          {travelers?.map((traveler, index) => {
             const statusInfo = getStatusInfo(traveler);
             return (
               <tr

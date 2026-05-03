@@ -14,27 +14,30 @@ export function DashboardPage() {
   const { travelers } = useTravelers();
   const today = new Date();
 
-  const activeCount = travelers.filter((t) => !t.exitDate).length;
-  const exitedCount = travelers.filter((t) => t.exitDate).length;
+  console.log(travelers);
 
-  const overstayCount = travelers.filter((t) => {
+  const activeCount = travelers?.data.filter((t) => !t.exitDate).length;
+  const exitedCount = travelers?.data.filter((t) => t.exitDate).length;
+const testdata=travelers?.data|| [];
+const overstayCount = travelers?.data.filter((t) => {
     if (t.exitDate) return false;
     const maxStayDate = new Date(t.maxStayDate);
     return differenceInDays(maxStayDate, today) < 0;
   }).length;
 
-  const criticalCount = travelers.filter((t) => {
+  const criticalCount = testdata.filter((t) => {
     if (t.exitDate) return false;
     const maxStayDate = new Date(t.maxStayDate);
     return differenceInDays(maxStayDate, today) < -7;
   }).length;
 
-  const recentTravelers = travelers
+  const recentTravelers = testdata
     .sort((a, b) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime())
     .slice(0, 5);
+// const testdata=travelers?.data|| [];
 
   const topNationalities = Object.entries(
-    travelers.reduce((acc, t) => {
+    testdata.reduce((acc, t) => {
       acc[t.nationality] = (acc[t.nationality] || 0) + 1;
       return acc;
     }, {} as Record<string, number>)
@@ -45,7 +48,7 @@ export function DashboardPage() {
   const stats = [
     {
       label: 'Tổng số du khách',
-      value: travelers.length,
+      value: travelers?.data.length || 0,
       icon: Users,
       color: 'from-blue-500 to-blue-600',
       textColor: 'text-blue-600',
@@ -183,7 +186,7 @@ export function DashboardPage() {
           </div>
           <div className="space-y-4">
             {topNationalities.map(([nationality, count], index) => {
-              const percentage = (count / travelers.length) * 100;
+              const percentage = (count / testdata.length) * 100;
               return (
                 <div key={nationality}>
                   <div className="flex items-center justify-between mb-2">

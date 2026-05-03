@@ -1,10 +1,12 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode,useEffect } from 'react';
 import { Traveler, TravelerFormData } from '../types/traveler';
 import { mockTravelers } from '../data/mockData';
 import { addDays, format } from 'date-fns';
+import { DataResponse } from '../types/traveler';
+
 
 interface TravelerContextType {
-  travelers: Traveler[];
+  travelers: DataResponse | undefined;
   addTraveler: (data: TravelerFormData) => void;
   updateTraveler: (id: string, data: TravelerFormData) => void;
   deleteTraveler: (id: string) => void;
@@ -12,35 +14,20 @@ interface TravelerContextType {
 
 const TravelerContext = createContext<TravelerContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'immigration_travelers';
-
-// Load dữ liệu từ localStorage hoặc dùng mock data
-function loadTravelers(): Traveler[] {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-  } catch (error) {
-    console.error('Error loading travelers:', error);
-  }
-  return mockTravelers;
-}
-
 export function TravelerProvider({ children }: { children: ReactNode }) {
-  const [travelers, setTravelers] = useState<Traveler[]>(loadTravelers);
+  const [travelers, setTravelers] = useState< DataResponse>();
+const gettravelers = async () => { 
+  const data= await fetch('http://localhost:8080/api/travelers')
+  const travelersData = await data.json();
+  setTravelers(travelersData);
+};
+useEffect(() => {
+  gettravelers();
+}, []);
 
-  // Lưu vào localStorage mỗi khi travelers thay đổi
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(travelers));
-    } catch (error) {
-      console.error('Error saving travelers:', error);
-    }
-  }, [travelers]);
-
-  const addTraveler = (data: TravelerFormData) => {
+  const addTraveler = async (data: TravelerFormData) => {
     const maxStayDate = format(
+
       addDays(new Date(data.entryDate), data.maxStayDays),
       'yyyy-MM-dd'
     );
@@ -50,8 +37,16 @@ export function TravelerProvider({ children }: { children: ReactNode }) {
       ...data,
       maxStayDate,
     };
+    await fetch('http://localhost:8080/api/travelers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newTraveler),
+    });
+    alert('Thêm du khách thành công!');
+    gettravelers();
 
-    setTravelers([...travelers, newTraveler]);
   };
 
   const updateTraveler = (id: string, data: TravelerFormData) => {
@@ -60,15 +55,15 @@ export function TravelerProvider({ children }: { children: ReactNode }) {
       'yyyy-MM-dd'
     );
 
-    setTravelers(
-      travelers.map((t) =>
-        t.id === id ? { ...t, ...data, maxStayDate } : t
-      )
-    );
+    // setTravelers(
+    //   travelers.map((t) =>
+    //     t.id === id ? { ...t, ...data, maxStayDate } : t
+    //   )
+    // );
   };
 
   const deleteTraveler = (id: string) => {
-    setTravelers(travelers.filter((t) => t.id !== id));
+    // setTravelers(travelers.filter((t) => t.id !== id));
   };
 
   return (
