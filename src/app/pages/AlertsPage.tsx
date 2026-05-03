@@ -6,8 +6,7 @@ export function AlertsPage() {
   const { travelers } = useTravelers();
   const today = new Date();
 
-  const overstayTravelers = travelers
-    .filter((t) => {
+  const overstayTravelers = travelers?.data?.filter((t) => {
       if (t.exitDate) return false;
       const maxStayDate = new Date(t.maxStayDate);
       return differenceInDays(maxStayDate, today) < 0;
@@ -18,13 +17,12 @@ export function AlertsPage() {
     }))
     .sort((a, b) => b.daysOverstay - a.daysOverstay);
 
-  const criticalAlerts = overstayTravelers.filter((t) => t.daysOverstay > 7);
-  const warningAlerts = overstayTravelers.filter(
+  const criticalAlerts = overstayTravelers?.filter((t) => t.daysOverstay > 7);
+  const warningAlerts = overstayTravelers!.filter(
     (t) => t.daysOverstay > 0 && t.daysOverstay <= 7
   );
 
-  const expiringSoon = travelers
-    .filter((t) => {
+  const expiringSoon = travelers?.data?.filter((t) => {
       if (t.exitDate) return false;
       const daysRemaining = differenceInDays(new Date(t.maxStayDate), today);
       return daysRemaining > 0 && daysRemaining <= 7;
@@ -52,7 +50,7 @@ export function AlertsPage() {
             <AlertCircle className="w-6 h-6 text-red-600" />
             <h3 className="font-bold text-red-900">Cảnh báo đỏ</h3>
           </div>
-          <p className="text-3xl font-bold text-red-600">{criticalAlerts.length}</p>
+          <p className="text-3xl font-bold text-red-600">{criticalAlerts?.length}</p>
           <p className="text-sm text-red-700 mt-1">Quá hạn trên 7 ngày</p>
         </div>
 
@@ -61,7 +59,7 @@ export function AlertsPage() {
             <AlertTriangle className="w-6 h-6 text-orange-600" />
             <h3 className="font-bold text-orange-900">Cảnh báo vàng</h3>
           </div>
-          <p className="text-3xl font-bold text-orange-600">{warningAlerts.length}</p>
+          <p className="text-3xl font-bold text-orange-600">{warningAlerts?.length}</p>
           <p className="text-sm text-orange-700 mt-1">Quá hạn 1-7 ngày</p>
         </div>
 
@@ -70,24 +68,24 @@ export function AlertsPage() {
             <Clock className="w-6 h-6 text-blue-600" />
             <h3 className="font-bold text-blue-900">Sắp hết hạn</h3>
           </div>
-          <p className="text-3xl font-bold text-blue-600">{expiringSoon.length}</p>
+          <p className="text-3xl font-bold text-blue-600">{expiringSoon?.length}</p>
           <p className="text-sm text-blue-700 mt-1">Còn dưới 7 ngày</p>
         </div>
       </div>
 
       {/* Critical Alerts */}
-      {criticalAlerts.length > 0 && (
+      {criticalAlerts!.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
             <div className="flex items-center gap-3">
               <AlertCircle className="w-6 h-6 text-white" />
               <h2 className="text-xl font-bold text-white">
-                Cảnh báo đỏ - Ưu tiên cao ({criticalAlerts.length})
+                Cảnh báo đỏ - Ưu tiên cao ({criticalAlerts!.length})
               </h2>
             </div>
           </div>
           <div className="divide-y divide-gray-200">
-            {criticalAlerts.map((traveler) => (
+            {criticalAlerts!.map((traveler) => (
               <div
                 key={traveler.id}
                 className="p-6 hover:bg-red-50 transition"
@@ -142,7 +140,7 @@ export function AlertsPage() {
       )}
 
       {/* Warning Alerts */}
-      {warningAlerts.length > 0 && (
+      {warningAlerts?.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4">
             <div className="flex items-center gap-3">
@@ -204,18 +202,18 @@ export function AlertsPage() {
       )}
 
       {/* Expiring Soon */}
-      {expiringSoon.length > 0 && (
+      {expiringSoon!.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
             <div className="flex items-center gap-3">
               <Clock className="w-6 h-6 text-white" />
               <h2 className="text-xl font-bold text-white">
-                Sắp hết hạn - Theo dõi ({expiringSoon.length})
+                Sắp hết hạn - Theo dõi ({expiringSoon!.length})
               </h2>
             </div>
           </div>
           <div className="divide-y divide-gray-200">
-            {expiringSoon.map((traveler) => (
+            {expiringSoon!.map((traveler) => (
               <div
                 key={traveler.id}
                 className="p-6 hover:bg-blue-50 transition"
@@ -266,9 +264,9 @@ export function AlertsPage() {
       )}
 
       {/* No Alerts */}
-      {criticalAlerts.length === 0 &&
-        warningAlerts.length === 0 &&
-        expiringSoon.length === 0 && (
+      {criticalAlerts!.length === 0 &&
+        warningAlerts!.length === 0 &&
+        expiringSoon!.length === 0 && (
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="w-10 h-10 text-green-600" />
