@@ -149,14 +149,14 @@ Sau khi chạy thành công, bạn sẽ thấy:
 ```
 ==============================================
 Immigration Management System Started!
-API URL: http://localhost:8080/api
+API URL: http://qunlkhchquct-production.up.railway.app/api
 ==============================================
 ```
 
 **Test API bằng Browser:**
 
 ```
-GET http://localhost:8080/api/travelers
+GET http://qunlkhchquct-production.up.railway.app/api/travelers
 ```
 
 Nếu thấy response JSON → Backend đã chạy thành công! ✅
@@ -175,23 +175,23 @@ Sau đó refresh API, bạn sẽ thấy 10 du khách mẫu.
 
 ### 1. Lấy tất cả du khách
 ```
-GET http://localhost:8080/api/travelers
+GET http://qunlkhchquct-production.up.railway.app/api/travelers
 ```
 
 ### 2. Tìm kiếm du khách
 ```
-GET http://localhost:8080/api/travelers?name=John
-GET http://localhost:8080/api/travelers?entryDate=2026-04-01
+GET http://qunlkhchquct-production.up.railway.app/api/travelers?name=John
+GET http://qunlkhchquct-production.up.railway.app/api/travelers?entryDate=2026-04-01
 ```
 
 ### 3. Lấy thông tin 1 du khách
 ```
-GET http://localhost:8080/api/travelers/1
+GET http://qunlkhchquct-production.up.railway.app/api/travelers/1
 ```
 
 ### 4. Thêm du khách mới
 ```
-POST http://localhost:8080/api/travelers
+POST http://qunlkhchquct-production.up.railway.app/api/travelers
 Content-Type: application/json
 
 {
@@ -209,7 +209,7 @@ Content-Type: application/json
 
 ### 5. Cập nhật du khách
 ```
-PUT http://localhost:8080/api/travelers/1
+PUT http://qunlkhchquct-production.up.railway.app/api/travelers/1
 Content-Type: application/json
 
 {
@@ -221,22 +221,22 @@ Content-Type: application/json
 
 ### 6. Xóa du khách
 ```
-DELETE http://localhost:8080/api/travelers/1
+DELETE http://qunlkhchquct-production.up.railway.app/api/travelers/1
 ```
 
 ### 7. Lấy thống kê
 ```
-GET http://localhost:8080/api/travelers/statistics
+GET http://qunlkhchquct-production.up.railway.app/api/travelers/statistics
 ```
 
 ## 🌐 Kết nối với Frontend React
 
-Sau khi backend chạy thành công tại `http://localhost:8080`, tạo file API service cho frontend:
+Sau khi backend chạy thành công tại `http://qunlkhchquct-production.up.railway.app`, tạo file API service cho frontend:
 
 ### File: `src/app/services/api.ts`
 
 ```typescript
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://qunlkhchquct-production.up.railway.app/api';
 
 export async function getAllTravelers() {
   const response = await fetch(`${API_BASE_URL}/travelers`);
@@ -392,7 +392,7 @@ SELECT * FROM travelers;
 ## 🎉 Hoàn tất!
 
 Bây giờ bạn có:
-✅ Backend Java Spring Boot chạy tại: `http://localhost:8080`
+✅ Backend Java Spring Boot chạy tại: `http://qunlkhchquct-production.up.railway.app`
 ✅ Frontend React chạy tại: `http://localhost:5173`
 ✅ Database PostgreSQL với sample data
 

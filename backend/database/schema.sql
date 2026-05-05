@@ -25,7 +25,6 @@ CREATE TABLE travelers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 -- Create indexes
 CREATE INDEX idx_passport ON travelers(passport_number);
 CREATE INDEX idx_entry_date ON travelers(entry_date);
