@@ -76,12 +76,10 @@ immigration-management/
 ├── API_SPECIFICATION.md
 └── README.md
 
-
-
-#####
 ## 🚀 Hướng dẫn cài đặt
 # 🚀 HƯỚNG DẪN CHẠY DỰ ÁN
 ## Sau khi repo project về
+## Trong code đang để cách chạy 1
 ## Cách 1 — Chạy nhanh bằng H2(Cách dễ nhất ạ )
 ## Bước 1: Chạy Backend
 Mở terminal:
@@ -91,9 +89,9 @@ mvn spring-boot:run
 ```
 Backend chạy tại:
 ```bash 
-http://localhost:8080
+http://localhost:8080/api
 ```
-H2 Console:
+
 ```bash
 sau đó mở
 http://localhost:8080/h2-console
