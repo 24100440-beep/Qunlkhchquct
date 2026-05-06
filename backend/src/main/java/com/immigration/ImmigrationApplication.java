@@ -10,7 +10,7 @@ public class ImmigrationApplication {
         SpringApplication.run(ImmigrationApplication.class, args);
         System.out.println("\n==============================================");
         System.out.println("Immigration Management System Started!");
-        System.out.println("API URL: http://qunlkhchquct-production.up.railway.app/api");
+        System.out.println("API URL: http://localhost:8080/api");
         System.out.println("==============================================\n");
     }
 }

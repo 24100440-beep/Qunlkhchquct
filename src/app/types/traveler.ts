@@ -9,7 +9,7 @@ export interface Traveler {
   entryLocation: string;
   entryReason: string;
   maxStayDays: number;
-  maxStayDate: string; // Calculated: entryDate + maxStayDays
+  maxStayDate: string; 
   exitDate?: string;
   exitLocation?: string;
 }

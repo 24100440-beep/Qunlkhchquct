@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode,useEffect } from 'react';
 import { Traveler, TravelerFormData } from '../types/traveler';
-import { mockTravelers } from '../data/mockData';
+// import { mockTravelers } from '../data/mockData';
 import { addDays, format } from 'date-fns';
 import { DataResponse } from '../types/traveler';
 
@@ -49,11 +49,24 @@ useEffect(() => {
 
   };
 
-  const updateTraveler = (id: string, data: TravelerFormData) => {
+  const updateTraveler = async (id: string, data: TravelerFormData) => {
     const maxStayDate = format(
       addDays(new Date(data.entryDate), data.maxStayDays),
       'yyyy-MM-dd'
     );
+    const updatedTraveler: Traveler = {
+      id,
+      ...data,
+      maxStayDate,
+    };
+    await fetch(`http://localhost:8080/api/travelers/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },      body: JSON.stringify(updatedTraveler),
+    });
+    alert('Cập nhật du khách thành công!');
+    gettravelers(); 
 
     // setTravelers(
     //   travelers.map((t) =>
@@ -62,7 +75,14 @@ useEffect(() => {
     // );
   };
 
-  const deleteTraveler = (id: string) => {
+  const deleteTraveler = async (id: string) => {
+    const confirmDelete = window.confirm('Bạn có chắc muốn xóa du khách này?');
+    if (!confirmDelete) return;
+    await fetch(`http://localhost:8080/api/travelers/${id}`, {
+      method: 'DELETE',
+    });
+    alert('Xóa du khách thành công!');
+    gettravelers(); 
     // setTravelers(travelers.filter((t) => t.id !== id));
   };
 

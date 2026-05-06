@@ -1,10 +1,4 @@
--- Create database (Run this separately in psql)
--- CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
 
--- Connect to the database before running the rest
--- \c immigration_db
-
--- Drop table if exists (for clean reinstall)
 DROP TABLE IF EXISTS travelers;
 
 -- Create travelers table

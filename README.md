@@ -1,20 +1,15 @@
 # Hệ thống Quản lý Xuất Nhập Cảnh
-
-Ứng dụng web Full-Stack quản lý thông tin du khách quốc tế tại các cửa khẩu Việt Nam.
-
+Ứng dụng web  quản lý thông tin du khách quốc tế tại các cửa khẩu Việt Nam.
 ## 📋 Tính năng
-
-✅ Quản lý thông tin du khách (Thêm, Sửa, Xóa)
-✅ Tìm kiếm theo tên, số hộ chiếu, ngày nhập cảnh
-✅ Thống kê du khách đang lưu trú, đã xuất cảnh
-✅ Cảnh báo tự động du khách quá hạn lưu trú
-✅ Cảnh báo đỏ cho du khách quá hạn >7 ngày
-✅ Dashboard với charts và biểu đồ
-✅ Navigation đa trang với sidebar
-✅ Giao diện đẹp mắt, responsive
-
-## 🛠️ Công nghệ sử dụng
-
+ Quản lý thông tin du khách (Thêm, Sửa, Xóa)
+ Tìm kiếm theo tên, số hộ chiếu, ngày nhập cảnh
+ Thống kê du khách đang lưu trú, đã xuất cảnh
+ Cảnh báo tự động du khách quá hạn lưu trú
+ Cảnh báo đỏ cho du khách quá hạn >7 ngày
+ Dashboard với charts và biểu đồ
+ Navigation đa trang với sidebar
+ Giao diện đẹp mắt, responsive
+##  Công nghệ sử dụng
 **Frontend:**
 - React 18 + TypeScript
 - React Router (multi-page)
@@ -31,10 +26,7 @@
 - PostgreSQL 12+
 - REST API
 - Maven
-
-## 📁 Cấu trúc dự án
-
-```
+## Cấu trúc dự án
 immigration-management/
 ├── src/app/                         # Frontend React
 │   ├── App.tsx                      # RouterProvider
@@ -81,129 +73,163 @@ immigration-management/
 │   │   └── sample_data.sql
 │   ├── pom.xml
 │   └── README_BACKEND.md
-│
-├── HUONG_DAN_KET_NOI_FULL_STACK.md  # ⭐ Đọc file này trước!
 ├── API_SPECIFICATION.md
 └── README.md
+
+
+
+#####
+## 🚀 Hướng dẫn cài đặt
+# 🚀 HƯỚNG DẪN CHẠY DỰ ÁN
+## Sau khi repo project về
+## Cách 1 — Chạy nhanh bằng H2(Cách dễ nhất ạ )
+## Bước 1: Chạy Backend
+Mở terminal:
+```bash
+cd backend
+mvn spring-boot:run
+```
+Backend chạy tại:
+```bash 
+http://localhost:8080
+```
+H2 Console:
+```bash
+sau đó mở
+http://localhost:8080/h2-console
+```
+Thông tin đăng nhập H2:
+```bash
+JDBC URL: jdbc:h2:file:./data/immigration_db
+User Name: sa
+Password: để trống
 ```
 
-## 🚀 Hướng dẫn cài đặt
-
-### ⭐ QUAN TRỌNG: Đọc file này trước!
-👉 [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)
-
-File này chứa hướng dẫn chi tiết từng bước để:
-1. Setup Backend Java + MySQL
-2. Chạy backend
-3. Kết nối Frontend với Backend
-4. Test toàn bộ hệ thống
-
-### Quick Start - Frontend Only (Mock Data):
-
+## Bước 2: Chạy Frontend
+Mở terminal mới:
 ```bash
-# Frontend đã sẵn sàng, chỉ cần chạy:
+npm install
 npm run dev
 ```
-
-Frontend sẽ chạy với mock data tại: http://localhost:5173
-
-### Quick Start - Full Stack (Frontend + Backend):
-
-**1. Setup Backend:**
+Frontend chạy tại:
 ```bash
-# Cài PostgreSQL và tạo database
-psql -U postgres
-CREATE DATABASE immigration_db WITH ENCODING 'UTF8';
-\q
+http://localhost:5173
+```
+---
+## Bước 3: Sử dụng hệ thống
+Mở trình duyệt:
+```bash
+http://localhost:5173
+```
+---
 
-# Tạo schema
-psql -U postgres -d immigration_db -f backend/database/schema.sql
+# Cách 2 — Chạy bằng PostgreSQL
 
-# Chạy backend
+## Bước 1: Cài PostgreSQL
+https://www.postgresql.org/download/windows/
+---
+Download the installer
+PostgreSQL Version:15.17
+## Bước 2: Tạo database
+Chỉ chọn 
+## PostgreSQL
+## pgadmin4
+## Spring Boot
+## không cần Stack Builder
+Bước tạo mật khẩu lên để là 0 vì trong code là 0
+Mở PostgreSQL:
+## Click chuột phải Servers
+→ Register
+→ Server...
+Name: Test Server có thể đặt My DB Test, Demo DB
+## Điền thông tin 
+Host name/address: localhost
+Port: 5432
+Maintenance database: postgres
+Username: postgres
+Password: 0
+## Cấu Hình 
+Servers
+ ├── My DB
+ ├── PostgreSQL 15
+ └── Test Server
+ ## Chuột phải vào:
+
+Test Server → Databases
+
+→ Create
+→ Database...
+
+Điền: 
+
+Database name:Database name: immigration_db
+Owner: postgres
+
+→ Save
+## chọn immigration_db → Query Tool → Open file sample_data.sql → Execute → kiểm tra Tables.
+
+ ##  Cập nhập File src/main/resources/application.properties
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/immigration_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD(0)
+spring.jpa.hibernate.ddl-auto=update
+```
+
+---
+
+## Bước 4: Chạy Backend
+
+```bash
 cd backend
 mvn spring-boot:run
 ```
 
-**2. Chạy Frontend:**
+Backend chạy tại:
+
 ```bash
+http://localhost:8080/api
+```
+
+---
+
+## Bước 5: Chạy Frontend
+
+Mở terminal mới:
+
+```bash
+npm install
 npm run dev
 ```
 
-Xem chi tiết trong [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)
+Frontend chạy tại:
 
-## 📚 Tài liệu
-
-### Hướng dẫn Setup & Kết nối:
-- 📖 [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md) - **Đọc file này trước!**
-- 📖 [backend/README_BACKEND.md](./backend/README_BACKEND.md) - Chi tiết backend
-- 📖 [API_SPECIFICATION.md](./API_SPECIFICATION.md) - API reference
-
+```bash
+http://localhost:5173
+```
 ### API Endpoints (Backend):
-✅ **HOÀN THÀNH** - Không cần code thêm!
-
 - `GET /api/travelers` - Lấy danh sách (có search)
 - `GET /api/travelers/:id` - Lấy 1 du khách
 - `POST /api/travelers` - Thêm du khách mới
 - `PUT /api/travelers/:id` - Cập nhật thông tin
 - `DELETE /api/travelers/:id` - Xóa du khách
 - `GET /api/travelers/statistics` - Lấy thống kê
-
 ### Frontend Pages:
 - 🏠 **Dashboard** - Tổng quan, thống kê, du khách mới
 - 👥 **Travelers** - CRUD quản lý du khách
 - 📊 **Statistics** - Charts & biểu đồ phân tích
 - 🚨 **Alerts** - Cảnh báo quá hạn lưu trú
 
-## ✅ Checklist Setup
-
-### Frontend (React):
-- [x] Tất cả components đã tạo
-- [x] Multi-page routing (4 trang)
-- [x] Mock data có sẵn
-- [x] API service sẵn sàng
-- [ ] Uncomment API code khi backend chạy
-
 ### Backend (Java + PostgreSQL):
-- [x] Full source code đã tạo
-- [x] Database schema SQL (PostgreSQL)
-- [x] Sample data
+- [ ] Database schema SQL (PostgreSQL)
+- [ ] Sample data
 - [ ] Cài PostgreSQL
 - [ ] Tạo database
 - [ ] Chạy schema.sql
 - [ ] Config password trong application.properties
 - [ ] Chạy backend: `mvn spring-boot:run`
 - [ ] Test API: http://localhost:8080/api/travelers
-
-### Kết nối:
-- [ ] Backend chạy thành công
-- [ ] Frontend uncomment API code
-- [ ] TravelerContext dùng API thay mock
-- [ ] Test thêm/sửa/xóa
-- [ ] Data lưu vào PostgreSQL
-
-## 🎯 Trạng thái hiện tại
-
-### ✅ Frontend - HOÀN THÀNH 100%
-- Tất cả 4 trang đã xong
-- UI đẹp với gradient, animations
-- Sidebar navigation
-- Charts & statistics
-- Mock data đang chạy
-
-### ✅ Backend - CODE HOÀN THÀNH 100%
-- Source code đã đầy đủ trong folder `backend/`
-- Chỉ cần: Cài MySQL → Config password → Chạy
-- Không cần code thêm gì!
-
-### 🔄 Chưa làm:
-- Cài đặt MySQL
-- Chạy backend
-- Kết nối frontend-backend (uncomment code)
-
-👉 Làm theo: [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_STACK.md)
-
-## 📊 Thông tin du khách
-
 **Thông tin cần nhập:**
 - Số hộ chiếu (bắt buộc, unique)
 - Họ và tên (bắt buộc)
@@ -216,30 +242,11 @@ Xem chi tiết trong [HUONG_DAN_KET_NOI_FULL_STACK.md](./HUONG_DAN_KET_NOI_FULL_
 - Số ngày lưu trú tối đa (bắt buộc, ≥1)
 - Thời gian xuất khẩu (tùy chọn)
 - Địa điểm xuất khẩu (tùy chọn)
-
 **Tự động tính:**
 - Thời hạn lưu trú tối đa = Ngày nhập + Số ngày lưu trú
-
 ## 📈 Thống kê
-
 - **Tổng số du khách**: Tất cả du khách trong hệ thống
 - **Đã xuất cảnh**: Du khách đã có thông tin xuất cảnh
 - **Đang lưu trú**: Du khách chưa xuất cảnh
 - **Quá hạn lưu trú**: Ngày hiện tại > Thời hạn lưu trú & chưa xuất cảnh
 - **Cảnh báo đỏ**: Quá hạn > 7 ngày
-
-## 🎨 Screenshots
-
-*(Xem ứng dụng đang chạy trong Figma Make preview)*
-
-## 👨‍💻 Phát triển bởi
-
-Dự án được phát triển để phục vụ quản lý xuất nhập cảnh tại các cửa khẩu.
-
-## 📄 License
-
-Educational Project - Free to use
-
----
-
-**Lưu ý:** Ứng dụng frontend đã hoàn chỉnh với mock data. Cần implement Java backend theo tài liệu API để có hệ thống hoàn chỉnh.
